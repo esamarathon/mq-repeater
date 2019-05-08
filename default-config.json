@@ -1,0 +1,13 @@
+{
+  "http": {
+    "port": 1234,
+    "key": "DEFAULT_KEY"
+  },
+  "rabbitmq": {
+    "protocol": "amqps",
+    "hostname": "URL",
+    "username": "USERNAME",
+    "password": "PASSWORD",
+    "vhost": "VHOST"
+  }
+}
