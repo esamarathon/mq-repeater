@@ -27,6 +27,7 @@ mqConn.then((conn) => {
   conn.createChannel().then((chan) => {
     mqChan = chan;
     chan.assertQueue('evt-donation-total');
+    chan.assertQueue('donation-fully-processed');
   }).catch(logRabbitMQErrors);
 }).catch(logRabbitMQErrors);
 
@@ -49,17 +50,15 @@ app.post('/tracker', (req, res) => {
       req.body.comment = '';
     }
 
-    const data = {
+    send('donation-fully-processed', {
       event: req.body.event,
-      id: req.body.id,
+      _id: req.body.id,
       donor_visiblename: req.body.donor_visiblename,
-      amount: req.body.amount,
+      amount: parseFloat(req.body.amount),
       comment_state: req.body.comment_state,
       comment: req.body.comment,
       time_received: req.body.time_received,
-    };
-
-    // send out to MQ here
+    });
   }
 
   // Donation total change, when the total goes up when a payment is confirmed.
@@ -78,7 +77,7 @@ function send(queue: string, data: object) {
     queue,
     Buffer.from(JSON.stringify(data)),
   );
-  queueLog('evt-donation-total', JSON.stringify(data));
+  queueLog(queue, JSON.stringify(data));
 }
 
 function queueLog(queue: string, data: string) {
