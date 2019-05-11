@@ -81,6 +81,6 @@ function send(queue: string, data: object) {
   queueLog('evt-donation-total', JSON.stringify(data));
 }
 
-function queueLog(name: string, queue: string) {
-  console.log('Sending to queue %s: %s', queue, name);
+function queueLog(queue: string, data: string) {
+  console.log('Sending to queue %s: %s', queue, data);
 }
