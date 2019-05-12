@@ -50,6 +50,7 @@ app.post('/tracker', (req, res) => {
       req.body.comment = '';
     }
 
+    // When a donation has either been read or ignored/denied.
     send('donation-fully-processed', {
       event: req.body.event,
       _id: req.body.id,
