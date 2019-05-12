@@ -28,6 +28,8 @@ mqConn.then((conn) => {
     mqChan = chan;
     chan.assertQueue('evt-donation-total');
     chan.assertQueue('donation-fully-processed');
+    chan.assertQueue('new-screened-tweet');
+    chan.assertQueue('new-screened-sub');
   }).catch(logRabbitMQErrors);
 }).catch(logRabbitMQErrors);
 
@@ -71,6 +73,45 @@ app.post('/tracker', (req, res) => {
   }
 
   res.sendStatus(200);
+});
+
+// Omnibar moderation tool POSTs to here.
+app.post('/omnibar_mod', (req, res) => {
+  // Reject POSTs without the correct key.
+  if (req.query.key !== config.http.key) {
+    res.sendStatus(403);
+    return;
+  }
+
+  // Return a 400 if the body is not supplied.
+  if (!req.body) {
+    res.sendStatus(400);
+    return;
+  }
+
+  if (req.body.provider === 'twitter' && req.body.type === 'tweet') {
+    send('new-screened-tweet', {
+      message: {
+        full_text: req.body.message.full_text,
+      },
+      user: {
+        name: req.body.user.name,
+      },
+    });
+  }
+
+  if (req.body.provider === 'twitch' && ['sub', 'resub', 'giftsub'].includes(req.body.type)) {
+    send('new-screened-sub', {
+      message: {
+        trailing: req.body.message.trailing,
+        tags: {
+          'system-msg': req.body.message.tags['system-msg'],
+        },
+      },
+    });
+  }
+
+  res.json({ success: true });
 });
 
 function send(queue: string, data: object) {
