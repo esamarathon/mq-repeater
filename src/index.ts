@@ -38,6 +38,11 @@ function logRabbitMQErrors(err: any) {
   console.log('RabbitMQ server connection error: ', err);
 }
 
+// A GET in case you need to check the server is running.
+app.get('/', (req, res) => {
+  res.send('Running OK');
+});
+
 // Tracker POSTs to here.
 app.post('/tracker', (req, res) => {
   // Reject POSTs without the correct key.
