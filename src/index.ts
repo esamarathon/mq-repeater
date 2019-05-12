@@ -3,9 +3,10 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import fsExtra from 'fs-extra';
 import http from 'http';
+import path from 'path';
 
 // Load config if possible.
-const config = fsExtra.readJSONSync('./config.json', { throws: false });
+const config = fsExtra.readJSONSync(path.join(process.cwd(), './config.json'), { throws: false });
 if (!config) {
   console.log('You have forgotten the config.json file.');
   process.exit();
@@ -89,6 +90,7 @@ app.post('/omnibar_mod', (req, res) => {
     return;
   }
 
+  // Twitter Tweets
   if (req.body.provider === 'twitter' && req.body.type === 'tweet') {
     send('new-screened-tweet', {
       message: {
@@ -100,6 +102,7 @@ app.post('/omnibar_mod', (req, res) => {
     });
   }
 
+  // Twitch Subs
   if (req.body.provider === 'twitch' && ['sub', 'resub', 'giftsub'].includes(req.body.type)) {
     send('new-screened-sub', {
       message: {
