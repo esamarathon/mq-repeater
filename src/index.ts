@@ -5,12 +5,42 @@ import fsExtra from 'fs-extra';
 import http from 'http';
 import path from 'path';
 
-// Load config if possible.
-const config = fsExtra.readJSONSync(path.join(process.cwd(), './config.json'), { throws: false });
-if (!config) {
-  console.log('You have forgotten the config.json file.');
-  process.exit();
+interface Config {
+  http: {
+    port: number;
+    key: string;
+  };
+  rabbitmq: {
+    protocol: string;
+    hostname: string;
+    username: string;
+    password: string;
+    vhost: string;
+  };
 }
+
+// Configs!
+const confFile: Config = fsExtra.readJSONSync(
+  path.join(process.cwd(), './config.json'),
+  { throws: false },
+) || <Config>{ http: {}, rabbitmq: {} };
+const env = process.env;
+const envPort = (
+  env.HTTP_PORT && !isNaN(parseInt(env.HTTP_PORT, 0))
+  ) ? parseInt(env.HTTP_PORT, 0) : undefined;
+export let config: Config = {
+  http: {
+    port: envPort || confFile.http.port || 1234,
+    key: env.HTTP_KEY || confFile.http.key || 'DEFAULT_KEY',
+  },
+  rabbitmq: {
+    protocol: env.RABBITMQ_PROTOCOL || confFile.rabbitmq.protocol || 'amqps',
+    hostname: env.RABBITMQ_HOSTNAME || confFile.rabbitmq.hostname || 'URL',
+    username: env.RABBITMQ_USERNAME || confFile.rabbitmq.username || 'USERNAME',
+    password: env.RABBITMQ_PASSWORD || confFile.rabbitmq.password || 'PASSWORD',
+    vhost: env.RABBITMQ_VHOST || confFile.rabbitmq.vhost,
+  },
+};
 
 // Set up HTTP server.
 console.log('HTTP server starting...');
