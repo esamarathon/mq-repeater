@@ -8,14 +8,14 @@ import path from 'path';
 interface Config {
   http: {
     port: number;
-    key: string;
+    key: string | undefined;
   };
   rabbitmq: {
     protocol: string;
-    hostname: string;
-    username: string;
-    password: string;
-    vhost: string;
+    hostname: string | undefined;
+    username: string | undefined;
+    password: string | undefined;
+    vhost: string | undefined;
   };
 }
 
@@ -31,13 +31,13 @@ const envPort = (
 export let config: Config = {
   http: {
     port: envPort || confFile.http.port || 1234,
-    key: env.HTTP_KEY || confFile.http.key || 'DEFAULT_KEY',
+    key: env.HTTP_KEY || confFile.http.key,
   },
   rabbitmq: {
     protocol: env.RABBITMQ_PROTOCOL || confFile.rabbitmq.protocol || 'amqps',
-    hostname: env.RABBITMQ_HOSTNAME || confFile.rabbitmq.hostname || 'URL',
-    username: env.RABBITMQ_USERNAME || confFile.rabbitmq.username || 'USERNAME',
-    password: env.RABBITMQ_PASSWORD || confFile.rabbitmq.password || 'PASSWORD',
+    hostname: env.RABBITMQ_HOSTNAME || confFile.rabbitmq.hostname,
+    username: env.RABBITMQ_USERNAME || confFile.rabbitmq.username,
+    password: env.RABBITMQ_PASSWORD || confFile.rabbitmq.password,
     vhost: env.RABBITMQ_VHOST || confFile.rabbitmq.vhost,
   },
 };
@@ -76,7 +76,7 @@ app.get('/', (req, res) => {
 // Tracker POSTs to here.
 app.post('/tracker', (req, res) => {
   // Reject POSTs without the correct key.
-  if (req.query.key !== config.http.key) {
+  if (config.http.key && req.query.key !== config.http.key) {
     res.sendStatus(403);
     return;
   }
@@ -114,7 +114,7 @@ app.post('/tracker', (req, res) => {
 // Omnibar moderation tool POSTs to here.
 app.post('/omnibar_mod', (req, res) => {
   // Reject POSTs without the correct key.
-  if (req.query.key !== config.http.key) {
+  if (config.http.key && req.query.key !== config.http.key) {
     res.sendStatus(403);
     return;
   }
