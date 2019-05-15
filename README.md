@@ -12,7 +12,7 @@ npm run package
 npm start
 ```
 
-A Docker container is also available [on Docker Hub](https://cloud.docker.com/u/esamarathon/repository/docker/esamarathon/mq-repeater).
+A Docker container is also available [on Docker Hub](https://hub.docker.com/r/esamarathon/mq-repeater).
 
 ## Configuration
 
