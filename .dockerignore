@@ -1,0 +1,9 @@
+.git/
+dist/
+node_modules/
+pkg/
+.gitignore
+config.json
+Dockerfile
+.dockerignore
+twitch_db.json
