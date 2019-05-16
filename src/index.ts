@@ -28,7 +28,7 @@ const env = process.env;
 const envPort = (
   env.HTTP_PORT && !isNaN(parseInt(env.HTTP_PORT, 0))
   ) ? parseInt(env.HTTP_PORT, 0) : undefined;
-export let config: Config = {
+const config: Config = {
   http: {
     port: envPort || confFile.http.port || 1234,
     key: env.HTTP_KEY || confFile.http.key,
