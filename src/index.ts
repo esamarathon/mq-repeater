@@ -1,3 +1,4 @@
+import amqpConnectionManager from 'amqp-connection-manager';
 import amqplib from 'amqplib';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -35,7 +36,7 @@ const config: Config = {
   },
   rabbitmq: {
     protocol: env.RABBITMQ_PROTOCOL || confFile.rabbitmq.protocol || 'amqps',
-    hostname: env.RABBITMQ_HOSTNAME || confFile.rabbitmq.hostname,
+    hostname: env.RABBITMQ_HOSTNAME || confFile.rabbitmq.hostname || 'localhost',
     username: env.RABBITMQ_USERNAME || confFile.rabbitmq.username,
     password: env.RABBITMQ_PASSWORD || confFile.rabbitmq.password,
     vhost: env.RABBITMQ_VHOST || confFile.rabbitmq.vhost,
@@ -51,22 +52,27 @@ server.listen(config.http.port);
 console.log(`HTTP server listening on port ${config.http.port}.`);
 
 console.log('RabbitMQ connecting...');
-const mqConn = amqplib.connect(config.rabbitmq);
-let mqChan: amqplib.Channel;
-mqConn.then((conn) => {
+const mqConn = amqpConnectionManager.connect([buildMQURL(config)]);
+mqConn.on('connect', () => {
   console.log('RabbitMQ server connection successful.');
-  conn.createChannel().then((chan) => {
-    mqChan = chan;
+});
+mqConn.on('disconnect', (err) => {
+  console.log('RabbitMQ server connection closed.');
+  if (err) {
+    console.log('RabbitMQ server connection error: ', err);
+  }
+});
+
+const mqChan = mqConn.createChannel({
+  json: false,
+  setup(chan: amqplib.Channel) {
     chan.assertQueue('evt-donation-total');
     chan.assertQueue('donation-fully-processed');
     chan.assertQueue('new-screened-tweet');
     chan.assertQueue('new-screened-sub');
-  }).catch(logRabbitMQErrors);
-}).catch(logRabbitMQErrors);
-
-function logRabbitMQErrors(err: any) {
-  console.log('RabbitMQ server connection error: ', err);
-}
+    return;
+  },
+});
 
 // A GET in case you need to check the server is running.
 app.get('/', (req, res) => {
@@ -162,4 +168,22 @@ function send(queue: string, data: object) {
 
 function queueLog(queue: string, data: string) {
   console.log('Sending to queue %s: %s', queue, data);
+}
+
+function buildMQURL(config: Config) {
+  let url = `${config.rabbitmq.protocol}://`;
+  if (config.rabbitmq.username) {
+    url = `${url}${config.rabbitmq.username}`;
+  }
+  if (config.rabbitmq.username && config.rabbitmq.password) {
+    url = `${url}:`;
+  }
+  if (config.rabbitmq.password) {
+    url = `${url}${config.rabbitmq.password}`;
+  }
+  url = `${url}@${config.rabbitmq.hostname}`;
+  if (config.rabbitmq.vhost) {
+    url = `${url}/${config.rabbitmq.vhost}`;
+  }
+  return url;
 }
