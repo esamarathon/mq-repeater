@@ -52,11 +52,11 @@ server.listen(config.http.port);
 console.log(`HTTP server listening on port ${config.http.port}.`);
 
 console.log('RabbitMQ connecting...');
-const mqConn = amqpConnectionManager.connect([buildMQURL(config)]);
-mqConn.on('connect', () => {
+const mqConn = amqpConnectionManager.connect(
+  [buildMQURL(config)]
+).on('connect', () => {
   console.log('RabbitMQ server connection successful.');
-});
-mqConn.on('disconnect', (err) => {
+}).on('disconnect', (err) => {
   console.log('RabbitMQ server connection closed.');
   if (err) {
     console.log('RabbitMQ server connection error: ', err);
@@ -65,13 +65,15 @@ mqConn.on('disconnect', (err) => {
 
 const mqChan = mqConn.createChannel({
   json: false,
-  setup(chan: amqplib.Channel) {
+  setup(chan: amqplib.ConfirmChannel) {
     chan.assertQueue('evt-donation-total');
     chan.assertQueue('donation-fully-processed');
     chan.assertQueue('new-screened-tweet');
     chan.assertQueue('new-screened-sub');
     return;
   },
+}).on('error', (err) => {
+  console.log('RabbitMQ server channel error: ', err);
 });
 
 // A GET in case you need to check the server is running.
