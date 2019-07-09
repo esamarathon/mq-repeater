@@ -182,19 +182,23 @@ function messageLog(exchange: string, key: string, data: string) {
 }
 
 function buildMQURL(config: Config) {
-  let url = `${config.rabbitmq.protocol}://`;
-  if (config.rabbitmq.username) {
-    url = `${url}${config.rabbitmq.username}`;
-  }
-  if (config.rabbitmq.username && config.rabbitmq.password) {
-    url = `${url}:`;
-  }
-  if (config.rabbitmq.password) {
-    url = `${url}${config.rabbitmq.password}`;
-  }
-  url = `${url}@${config.rabbitmq.hostname}`;
+  let url = `${config.rabbitmq.protocol}://${config.rabbitmq.hostname}`;
+
   if (config.rabbitmq.vhost) {
-    url = `${url}/${config.rabbitmq.vhost}`;
+    url += `/${config.rabbitmq.vhost}`;
   }
-  return url;
+
+  if (!config.rabbitmq.username && !config.rabbitmq.password)
+  {
+    return { url: url } as any;
+  }
+  else
+  {
+    return { url: url, connectionOptions: {
+      credentials: amqplib.credentials.plain(
+        config.rabbitmq.username as string,
+        config.rabbitmq.password as string
+      )
+    }} as any;
+  }
 }
