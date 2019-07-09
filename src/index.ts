@@ -53,7 +53,7 @@ console.log(`HTTP server listening on port ${config.http.port}.`);
 
 console.log('RabbitMQ connecting...');
 const mqConn = amqpConnectionManager.connect(
-  [buildMQURL(config)]
+  [buildMQURL(config)],
 ).on('connect', () => {
   console.log('RabbitMQ server connection successful.');
 }).on('disconnect', (err) => {
@@ -165,13 +165,13 @@ app.post('/omnibar_mod', (req, res) => {
 });
 
 function send(exchange: string, key: string, data: object) {
-  let jsonData: string = JSON.stringify(data);
+  const jsonData: string = JSON.stringify(data);
 
   mqChan.publish(
     exchange,
     key,
     Buffer.from(jsonData),
-    { persistent: true }
+    { persistent: true },
   );
 
   messageLog(exchange, key, jsonData);
@@ -188,17 +188,15 @@ function buildMQURL(config: Config) {
     url += `/${config.rabbitmq.vhost}`;
   }
 
-  if (!config.rabbitmq.username && !config.rabbitmq.password)
-  {
-    return { url: url } as any;
+  if (!config.rabbitmq.username && !config.rabbitmq.password) {
+    return { url } as any;
   }
-  else
-  {
-    return { url: url, connectionOptions: {
-      credentials: amqplib.credentials.plain(
+
+  return { url, connectionOptions: {
+    credentials: amqplib.credentials.plain(
         config.rabbitmq.username as string,
-        config.rabbitmq.password as string
-      )
-    }} as any;
-  }
+        config.rabbitmq.password as string,
+      ),
+  }} as any;
+
 }
