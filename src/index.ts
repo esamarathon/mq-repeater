@@ -63,13 +63,17 @@ const mqConn = amqpConnectionManager.connect(
   }
 });
 
+const trackerExchange = 'tracker';
+const moderationExchange = 'moderation';
+
 const mqChan = mqConn.createChannel({
   json: false,
   setup(chan: amqplib.ConfirmChannel) {
-    chan.assertQueue('evt-donation-total');
-    chan.assertQueue('donation-fully-processed');
-    chan.assertQueue('new-screened-tweet');
-    chan.assertQueue('new-screened-sub');
+    const exchangeSettings = { durable: true, autoDelete: true };
+
+    chan.assertExchange(trackerExchange, 'topic', exchangeSettings);
+    chan.assertExchange(moderationExchange, 'topic', exchangeSettings);
+
     return;
   },
 }).on('error', (err) => {
@@ -97,7 +101,7 @@ app.post('/tracker', (req, res) => {
     }
 
     // When a donation has either been read or ignored/denied.
-    send('donation-fully-processed', {
+    send(trackerExchange, `donation.${req.body.id}.fully_processed`, {
       event: req.body.event,
       _id: req.body.id,
       donor_visiblename: req.body.donor_visiblename,
@@ -110,7 +114,7 @@ app.post('/tracker', (req, res) => {
 
   // Donation total change, when the total goes up when a payment is confirmed.
   if (req.body.message_type === 'donation_total_change') {
-    send('evt-donation-total', {
+    send(trackerExchange, 'donation_total.updated', {
       event: req.body.event,
       new_total: parseFloat(req.body.new_total),
     });
@@ -135,7 +139,7 @@ app.post('/omnibar_mod', (req, res) => {
 
   // Twitter Tweets
   if (req.body.provider === 'twitter' && req.body.type === 'tweet') {
-    send('new-screened-tweet', {
+    send(moderationExchange, 'screened.tweet', {
       message: {
         full_text: req.body.message.full_text,
       },
@@ -147,7 +151,7 @@ app.post('/omnibar_mod', (req, res) => {
 
   // Twitch Subs
   if (req.body.provider === 'twitch' && ['sub', 'resub', 'giftsub'].includes(req.body.type)) {
-    send('new-screened-sub', {
+    send(moderationExchange, 'screened.sub', {
       message: {
         trailing: req.body.message.trailing,
         tags: {
@@ -160,32 +164,41 @@ app.post('/omnibar_mod', (req, res) => {
   res.json({ success: true });
 });
 
-function send(queue: string, data: object) {
-  mqChan.sendToQueue(
-    queue,
-    Buffer.from(JSON.stringify(data)),
+function send(exchange: string, key: string, data: object) {
+  let jsonData: string = JSON.stringify(data);
+
+  mqChan.publish(
+    exchange,
+    key,
+    Buffer.from(jsonData),
+    { persistent: true }
   );
-  queueLog(queue, JSON.stringify(data));
+
+  messageLog(exchange, key, jsonData);
 }
 
-function queueLog(queue: string, data: string) {
-  console.log('Sending to queue %s: %s', queue, data);
+function messageLog(exchange: string, key: string, data: string) {
+  console.log('Sending to exchange %s, key %s: %s', exchange, key, data);
 }
 
 function buildMQURL(config: Config) {
-  let url = `${config.rabbitmq.protocol}://`;
-  if (config.rabbitmq.username) {
-    url = `${url}${config.rabbitmq.username}`;
-  }
-  if (config.rabbitmq.username && config.rabbitmq.password) {
-    url = `${url}:`;
-  }
-  if (config.rabbitmq.password) {
-    url = `${url}${config.rabbitmq.password}`;
-  }
-  url = `${url}@${config.rabbitmq.hostname}`;
+  let url = `${config.rabbitmq.protocol}://${config.rabbitmq.hostname}`;
+
   if (config.rabbitmq.vhost) {
-    url = `${url}/${config.rabbitmq.vhost}`;
+    url += `/${config.rabbitmq.vhost}`;
   }
-  return url;
+
+  if (!config.rabbitmq.username && !config.rabbitmq.password)
+  {
+    return { url: url } as any;
+  }
+  else
+  {
+    return { url: url, connectionOptions: {
+      credentials: amqplib.credentials.plain(
+        config.rabbitmq.username as string,
+        config.rabbitmq.password as string
+      )
+    }} as any;
+  }
 }
