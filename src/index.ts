@@ -101,7 +101,7 @@ app.post('/tracker', (req, res) => {
     }
 
     // When a donation has either been read or ignored/denied.
-    send(trackerExchange, `donation.${req.body.id}.fully_processed`, {
+    send(trackerExchange, `${req.body.event}.donation.${req.body.id}.fully_processed`, {
       event: req.body.event,
       _id: req.body.id,
       donor_visiblename: req.body.donor_visiblename,
@@ -114,7 +114,7 @@ app.post('/tracker', (req, res) => {
 
   // Donation total change, when the total goes up when a payment is confirmed.
   if (req.body.message_type === 'donation_total_change') {
-    send(trackerExchange, 'donation_total.updated', {
+    send(trackerExchange, `${req.body.event}.donation_total.updated`, {
       event: req.body.event,
       new_total: parseFloat(req.body.new_total),
     });
