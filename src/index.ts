@@ -161,6 +161,18 @@ app.post('/omnibar_mod', (req, res) => {
     });
   }
 
+  // Twitch Cheers
+  if (req.body.provider === 'twitch' && req.body.type === 'cheer') {
+    send(moderationExchange, 'screened.cheer', {
+      message: {
+        trailing: req.body.message.trailing,
+        tags: {
+          bits: req.body.message.tags.bits,
+        },
+      },
+    });
+  }
+
   res.json({ success: true });
 });
 
