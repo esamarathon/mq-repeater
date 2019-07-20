@@ -167,6 +167,7 @@ app.post('/omnibar_mod', (req, res) => {
       message: {
         trailing: req.body.message.trailing,
         tags: {
+          'display-name': req.body.message.tags['display-name'],
           bits: req.body.message.tags.bits,
         },
       },
