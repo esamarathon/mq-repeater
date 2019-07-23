@@ -3,7 +3,11 @@
     "extends": "tslint-config-airbnb",
     "jsRules": {},
     "rules": {
-        "linebreak-style": [true, "LF"]
+        "linebreak-style": [
+            true,
+            "LF"
+        ],
+        "import-name": false
     },
     "rulesDirectory": []
 }

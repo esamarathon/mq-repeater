@@ -5,9 +5,13 @@
   },
   "rabbitmq": {
     "protocol": "amqps",
-    "hostname": "URL",
+    "hostname": "localhost",
     "username": "USERNAME",
     "password": "PASSWORD",
-    "vhost": "VHOST"
+    "vhost": "VHOST",
+    "exchanges": {
+      "moderation": "moderation",
+      "tracker": "tracker"
+    }
   }
 }
