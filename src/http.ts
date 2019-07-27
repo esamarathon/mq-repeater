@@ -109,6 +109,11 @@ export class HTTPServer {
       this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.cheer', req.body);
     }
 
+    // Twitch Crowd Control
+    if (req.body.provider === 'crowdcontrol') {
+      this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.crowdcontrol', req.body);
+    }
+
     res.json({ success: true });
   }
 
