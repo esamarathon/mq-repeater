@@ -13,6 +13,7 @@ FROM debian
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 WORKDIR /home/appuser/app
+COPY ./default-config.json ./
 COPY --from=builder /home/node/app/pkg/mq-repeater ./
 EXPOSE 1234
 CMD ./mq-repeater
