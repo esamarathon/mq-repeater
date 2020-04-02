@@ -22,7 +22,7 @@ export class HTTPServer {
     console.log(`HTTP server listening on port ${config.http.port}.`);
   }
 
-  initRoutes() {
+  initRoutes(): void {
     // A GET in case you need to check the server is running.
     this.app.get('/', (req, res) => {
       res.send('Running OK');
@@ -37,7 +37,7 @@ export class HTTPServer {
     });
   }
 
-  handleTracker(req: Request, res: Response) {
+  handleTracker(req: Request, res: Response): void {
     // Reject POSTs without the correct key.
     if (this.config.http.key && req.query.key !== this.config.http.key) {
       res.sendStatus(403);
@@ -52,29 +52,41 @@ export class HTTPServer {
       }
 
       // When a donation has either been read or ignored/denied.
-      this.mq.send(this.config.rabbitmq.exchanges.tracker, `${req.body.event}.donation.${req.body.id}.fully_processed`, {
-        event: req.body.event,
-        _id: req.body.id,
-        donor_visiblename: req.body.donor_visiblename,
-        amount: parseFloat(req.body.amount),
-        comment_state: req.body.comment_state,
-        comment: req.body.comment,
-        time_received: req.body.time_received,
-      });
+      /* eslint-disable @typescript-eslint/camelcase */
+      this.mq.send(
+        this.config.rabbitmq.exchanges.tracker,
+        `${req.body.event}.donation.${req.body.id}.fully_processed`,
+        {
+          event: req.body.event,
+          _id: req.body.id,
+          donor_visiblename: req.body.donor_visiblename,
+          amount: parseFloat(req.body.amount),
+          comment_state: req.body.comment_state,
+          comment: req.body.comment,
+          time_received: req.body.time_received,
+        },
+      );
+      /* eslint-enable */
     }
 
     // Donation total change, when the total goes up when a payment is confirmed.
+    /* eslint-disable @typescript-eslint/camelcase */
     if (req.body.message_type === 'donation_total_change') {
-      this.mq.send(this.config.rabbitmq.exchanges.tracker, `${req.body.event}.donation_total.updated`, {
-        event: req.body.event,
-        new_total: parseFloat(req.body.new_total),
-      });
+      this.mq.send(
+        this.config.rabbitmq.exchanges.tracker,
+        `${req.body.event}.donation_total.updated`,
+        {
+          event: req.body.event,
+          new_total: parseFloat(req.body.new_total),
+        },
+      );
+      /* eslint-enable */
     }
 
     res.sendStatus(200);
   }
 
-  handleOmnibar(req: Request, res: Response) {
+  handleOmnibar(req: Request, res: Response): void {
     // Reject POSTs without the correct key.
     if (this.config.http.key && req.query.key !== this.config.http.key) {
       res.sendStatus(403);
@@ -91,7 +103,7 @@ export class HTTPServer {
     if (req.body.provider === 'twitter' && req.body.type === 'tweet') {
       this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.tweet', {
         message: {
-          full_text: req.body.message.full_text,
+          full_text: req.body.message.full_text, // eslint-disable-line @typescript-eslint/camelcase
         },
         user: {
           name: req.body.user.name,
@@ -116,5 +128,4 @@ export class HTTPServer {
 
     res.json({ success: true });
   }
-
 }

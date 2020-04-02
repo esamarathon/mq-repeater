@@ -14,8 +14,8 @@ export interface Config {
     password: string | undefined;
     vhost: string | undefined;
     exchanges: {
-      tracker: string,
-      moderation: string,
+      tracker: string;
+      moderation: string;
     };
   };
 }
@@ -23,15 +23,17 @@ export interface Config {
 export function loadConfig(): Config {
   const defaultConfig: any = fsExtra.readJSONSync(
     path.join(process.cwd(), './default-config.json'),
-    { throws: false });
+    { throws: false },
+  );
   const extraConfig: any = fsExtra.readJSONSync(
     path.join(process.cwd(), './config.json'),
-    { throws: false });
+    { throws: false },
+  );
 
 
-  const env = process.env;
+  const { env } = process;
   const envPort = (
-    env.HTTP_PORT && !isNaN(parseInt(env.HTTP_PORT, 0))
+    env.HTTP_PORT && !Number.isNaN(parseInt(env.HTTP_PORT, 0))
   ) ? parseInt(env.HTTP_PORT, 0) : undefined;
   const envConfig: any = {
     http: {
@@ -45,6 +47,6 @@ export function loadConfig(): Config {
       password: env.RABBITMQ_PASSWORD,
       vhost: env.RABBITMQ_VHOST,
     },
-  }
-  return _.merge(defaultConfig, extraConfig, envConfig)
+  };
+  return _.merge(defaultConfig, extraConfig, envConfig);
 }

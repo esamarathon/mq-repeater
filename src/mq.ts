@@ -1,9 +1,8 @@
-import amqpConnectionManager, { AmqpConnectionManager, ChannelWrapper } from 'amqp-connection-manager';
+import amqpConnectionManager, { AmqpConnectionManager, ChannelWrapper } from 'amqp-connection-manager'; // eslint-disable-line max-len
 import amqplib from 'amqplib';
 import { Config } from './config';
 
-
-function buildMQURL(config: Config) {
+function buildMQURL(config: Config): any {
   let url = `${config.rabbitmq.protocol}://${config.rabbitmq.hostname}`;
 
   if (config.rabbitmq.vhost) {
@@ -15,20 +14,19 @@ function buildMQURL(config: Config) {
   }
 
   return {
-    url, connectionOptions: {
+    url,
+    connectionOptions: {
       credentials: amqplib.credentials.plain(
         config.rabbitmq.username as string,
         config.rabbitmq.password as string,
       ),
     },
   } as any;
-
 }
 
-function messageLog(exchange: string, key: string, data: string) {
+function messageLog(exchange: string, key: string, data: string): void {
   console.log('Sending to exchange %s, key %s: %s', exchange, key, data);
 }
-
 
 export class MQ {
   mqConn: AmqpConnectionManager;
@@ -53,15 +51,13 @@ export class MQ {
 
         chan.assertExchange(config.rabbitmq.exchanges.tracker, 'topic', exchangeSettings);
         chan.assertExchange(config.rabbitmq.exchanges.moderation, 'topic', exchangeSettings);
-
-        return;
       },
     }).on('error', (err) => {
       console.log('RabbitMQ server channel error: ', err);
     });
   }
 
-  send(exchange: string, key: string, data: object) {
+  send(exchange: string, key: string, data: object): void {
     const jsonData: string = JSON.stringify(data);
 
     this.mqChan.publish(
