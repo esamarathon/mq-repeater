@@ -1,19 +1,9 @@
-FROM node:10 AS builder
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
+FROM node:12
 WORKDIR /home/node/app
-USER node
-COPY --chown=node:node package*.json ./
+COPY ./package*.json ./
 RUN npm install
-COPY --chown=node:node . .
-# Build the code from the TypeScript source.
-# Package built code into binary using pkg.
-RUN npm run build && npm run package
-
-FROM debian
-RUN adduser --disabled-password --gecos '' appuser
-USER appuser
-WORKDIR /home/appuser/app
-COPY ./default-config.json ./
-COPY --from=builder /home/node/app/pkg/mq-repeater ./
+COPY . ./
+RUN npm run build
+RUN npm prune --production
 EXPOSE 1234
-CMD ./mq-repeater
+CMD npm start

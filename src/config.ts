@@ -27,6 +27,7 @@ export function loadConfig(): Config {
     path.join(process.cwd(), './default-config.json'),
     { throws: false },
   );
+  defaultConfig.http.keys = {};
   const extraConfig: any = fsExtra.readJSONSync(
     path.join(process.cwd(), './config.json'),
     { throws: false },
