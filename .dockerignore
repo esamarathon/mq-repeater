@@ -1,7 +1,6 @@
 .git/
 dist/
 node_modules/
-pkg/
 .gitignore
 config.json
 Dockerfile
