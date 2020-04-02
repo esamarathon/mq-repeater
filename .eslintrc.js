@@ -36,6 +36,6 @@ module.exports = {
     'no-console': 'off',
     'lines-between-class-members': 'off',
     '@typescript-eslint/no-explicit-any': 'off', // Should be fixed!
-    'eslint-disable import/prefer-default-export': 'off',
+    'import/prefer-default-export': 'off',
   },
 };
