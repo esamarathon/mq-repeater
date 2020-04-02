@@ -37,9 +37,19 @@ export class HTTPServer {
     });
   }
 
+  checkKey(httpKey?: string): string | undefined {
+    const { keys } = this.config.http;
+    const validKey = Object.keys(keys).find((key) => keys[key] === httpKey);
+    if (validKey) {
+      console.log('HTTP key used: %s', validKey);
+    }
+    return validKey;
+  }
+
   handleTracker(req: Request, res: Response): void {
     // Reject POSTs without the correct key.
-    if (this.config.http.key && req.query.key !== this.config.http.key) {
+    const validKey = this.checkKey(req.query.key);
+    if (!validKey) {
       res.sendStatus(403);
       return;
     }
@@ -87,8 +97,9 @@ export class HTTPServer {
   }
 
   handleOmnibar(req: Request, res: Response): void {
-    // Reject POSTs without the correct key.
-    if (this.config.http.key && req.query.key !== this.config.http.key) {
+    // Reject POSTs without a correct key.
+    const validKey = this.checkKey(req.query.key);
+    if (!validKey) {
       res.sendStatus(403);
       return;
     }

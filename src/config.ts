@@ -5,7 +5,9 @@ import path from 'path';
 export interface Config {
   http: {
     port: number;
-    key: string | undefined;
+    keys: {
+      [k: string]: string;
+    };
   };
   rabbitmq: {
     protocol: string;
@@ -32,13 +34,20 @@ export function loadConfig(): Config {
 
 
   const { env } = process;
+  const envKeys = Object.keys(env).reduce((previousValue, currentValue) => {
+    const obj = previousValue;
+    if (env[currentValue] && currentValue.startsWith('HTTP_KEY_')) {
+      obj[currentValue.replace('HTTP_KEY_', '')] = env[currentValue] || '';
+    }
+    return obj;
+  }, {} as { [k: string]: string });
   const envPort = (
     env.HTTP_PORT && !Number.isNaN(parseInt(env.HTTP_PORT, 0))
   ) ? parseInt(env.HTTP_PORT, 0) : undefined;
   const envConfig: any = {
     http: {
       port: envPort,
-      key: env.HTTP_KEY,
+      keys: envKeys,
     },
     rabbitmq: {
       protocol: env.RABBITMQ_PROTOCOL,

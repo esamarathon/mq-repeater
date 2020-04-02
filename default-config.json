@@ -1,7 +1,9 @@
 {
   "http": {
     "port": 1234,
-    "key": "DEFAULT_KEY"
+    "keys": {
+      "DEFAULT_NAME": "DEFAULT_KEY"
+    }
   },
   "rabbitmq": {
     "protocol": "amqps",

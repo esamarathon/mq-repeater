@@ -20,7 +20,7 @@ You can either configure the settings through a `config.json` file (see `default
 
 ```
 HTTP_PORT=1234
-HTTP_KEY=DEFAULT_KEY
+HTTP_KEY_CUSTOMNAME=CUSTOM_KEY
 RABBITMQ_PROTOCOL=amqps
 RABBITMQ_HOSTNAME=URL
 RABBITMQ_USERNAME=USERNAME
