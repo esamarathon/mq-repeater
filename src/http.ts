@@ -123,7 +123,17 @@ export class HTTPServer {
     }
 
     // Twitch Subs
-    if (req.body.provider === 'twitch' && ['sub', 'resub', 'giftsub'].includes(req.body.type)) {
+    const subTypes = [
+      'sub',
+      'resub',
+      'subgift',
+      'anonsubgift',
+      'submysterygift',
+      'giftpaidupgrade',
+      'rewardgift', // Is this even subscription related?
+      'anongiftpaidupgrade',
+    ];
+    if (req.body.provider === 'twitch' && subTypes.includes(req.body.type)) {
       this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.sub', req.body);
     }
 
