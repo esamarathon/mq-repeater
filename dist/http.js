@@ -100,7 +100,17 @@ var HTTPServer = /** @class */ (function () {
             });
         }
         // Twitch Subs
-        if (req.body.provider === 'twitch' && ['sub', 'resub', 'giftsub'].includes(req.body.type)) {
+        var subTypes = [
+            'sub',
+            'resub',
+            'subgift',
+            'anonsubgift',
+            'submysterygift',
+            'giftpaidupgrade',
+            'rewardgift',
+            'anongiftpaidupgrade',
+        ];
+        if (req.body.provider === 'twitch' && subTypes.includes(req.body.type)) {
             this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.sub', req.body);
         }
         // Twitch Cheers
