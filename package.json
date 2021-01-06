@@ -15,6 +15,7 @@
   "scripts": {
     "autofix": "eslint --fix --ext .ts src",
     "build": "tsc -b tsconfig.json",
+    "docker": "docker build --pull --rm -f \"Dockerfile\" -t docker.pkg.github.com/esamarathon/mq-repeater/mq-repeater:latest \".\"",
     "start": "node ./dist/index.js",
     "watch": "tsc -b tsconfig.json -w"
   },

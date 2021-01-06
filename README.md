@@ -8,11 +8,10 @@ A temporary bridge between certain services and our RabbitMQ server that don't s
 git clone https://github.com/esamarathon/mq-repeater.git
 npm install
 npm run build
-npm run package
 npm start
 ```
 
-A Docker container is also available [on Docker Hub](https://hub.docker.com/r/esamarathon/mq-repeater).
+A Docker image is also available under "Packages".
 
 ## Configuration
 
