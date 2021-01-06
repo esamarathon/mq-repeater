@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.loadConfig = void 0;
 var fs_extra_1 = __importDefault(require("fs-extra"));
 var lodash_1 = __importDefault(require("lodash"));
 var path_1 = __importDefault(require("path"));
@@ -18,7 +19,7 @@ function loadConfig() {
         }
         return obj;
     }, {});
-    var envPort = (env.HTTP_PORT && !Number.isNaN(parseInt(env.HTTP_PORT, 0))) ? parseInt(env.HTTP_PORT, 0) : undefined;
+    var envPort = Number(env.HTTP_PORT) || undefined;
     var envConfig = {
         http: {
             port: envPort,

@@ -33,7 +33,6 @@ export function loadConfig(): Config {
     { throws: false },
   );
 
-
   const { env } = process;
   const envKeys = Object.keys(env).reduce((previousValue, currentValue) => {
     const obj = previousValue;
@@ -42,9 +41,7 @@ export function loadConfig(): Config {
     }
     return obj;
   }, {} as { [k: string]: string });
-  const envPort = (
-    env.HTTP_PORT && !Number.isNaN(parseInt(env.HTTP_PORT, 0))
-  ) ? parseInt(env.HTTP_PORT, 0) : undefined;
+  const envPort = Number(env.HTTP_PORT) || undefined;
   const envConfig: any = {
     http: {
       port: envPort,

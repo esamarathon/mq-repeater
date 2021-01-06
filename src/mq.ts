@@ -57,7 +57,7 @@ export class MQ {
     });
   }
 
-  send(exchange: string, key: string, data: object): void {
+  send(exchange: string, key: string, data: unknown): void {
     const jsonData: string = JSON.stringify(data);
 
     this.mqChan.publish(

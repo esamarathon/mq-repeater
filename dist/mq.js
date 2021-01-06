@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.MQ = void 0;
 var amqp_connection_manager_1 = __importDefault(require("amqp-connection-manager")); // eslint-disable-line max-len
 var amqplib_1 = __importDefault(require("amqplib"));
 function buildMQURL(config) {

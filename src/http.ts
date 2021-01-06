@@ -48,7 +48,7 @@ export class HTTPServer {
 
   handleTracker(req: Request, res: Response): void {
     // Reject POSTs without the correct key.
-    const validKey = this.checkKey(req.query.key);
+    const validKey = this.checkKey(req.query.key as string);
     if (!validKey) {
       res.sendStatus(403);
       return;
@@ -62,7 +62,6 @@ export class HTTPServer {
       }
 
       // When a donation has either been read or ignored/denied.
-      /* eslint-disable @typescript-eslint/camelcase */
       this.mq.send(
         this.config.rabbitmq.exchanges.tracker,
         `${req.body.event}.donation.${req.body.id}.fully_processed`,
@@ -80,7 +79,6 @@ export class HTTPServer {
     }
 
     // Donation total change, when the total goes up when a payment is confirmed.
-    /* eslint-disable @typescript-eslint/camelcase */
     if (req.body.message_type === 'donation_total_change') {
       this.mq.send(
         this.config.rabbitmq.exchanges.tracker,
@@ -98,7 +96,7 @@ export class HTTPServer {
 
   handleOmnibar(req: Request, res: Response): void {
     // Reject POSTs without a correct key.
-    const validKey = this.checkKey(req.query.key);
+    const validKey = this.checkKey(req.query.key as string);
     if (!validKey) {
       res.sendStatus(403);
       return;
@@ -114,7 +112,7 @@ export class HTTPServer {
     if (req.body.provider === 'twitter' && req.body.type === 'tweet') {
       this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.tweet', {
         message: {
-          full_text: req.body.message.full_text, // eslint-disable-line @typescript-eslint/camelcase
+          full_text: req.body.message.full_text,
         },
         user: {
           name: req.body.user.name,

@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.HTTPServer = void 0;
 var body_parser_1 = __importDefault(require("body-parser"));
 var express_1 = __importDefault(require("express"));
 var http_1 = __importDefault(require("http"));
@@ -53,7 +54,6 @@ var HTTPServer = /** @class */ (function () {
                 req.body.comment = '';
             }
             // When a donation has either been read or ignored/denied.
-            /* eslint-disable @typescript-eslint/camelcase */
             this.mq.send(this.config.rabbitmq.exchanges.tracker, req.body.event + ".donation." + req.body.id + ".fully_processed", {
                 event: req.body.event,
                 _id: req.body.id,
@@ -66,7 +66,6 @@ var HTTPServer = /** @class */ (function () {
             /* eslint-enable */
         }
         // Donation total change, when the total goes up when a payment is confirmed.
-        /* eslint-disable @typescript-eslint/camelcase */
         if (req.body.message_type === 'donation_total_change') {
             this.mq.send(this.config.rabbitmq.exchanges.tracker, req.body.event + ".donation_total.updated", {
                 event: req.body.event,
