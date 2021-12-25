@@ -1,4 +1,4 @@
-import amqpConnectionManager, { AmqpConnectionManager, ChannelWrapper } from 'amqp-connection-manager'; // eslint-disable-line max-len
+import amqpConnectionManager, { AmqpConnectionManager, ChannelWrapper } from 'amqp-connection-manager';
 import amqplib from 'amqplib';
 import { Config } from './config';
 
