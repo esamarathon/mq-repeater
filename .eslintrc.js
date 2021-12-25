@@ -38,12 +38,9 @@ module.exports = {
       tsx: 'never',
     }],
 
-    // 'no-restricted-syntax': 'off',
-    // 'no-await-in-loop': 'off',
-
     'no-console': 'off',
     '@typescript-eslint/no-explicit-any': 'off', // Should be fixed!
-    'import/prefer-default-export': 'off',
+
   },
 
   overrides: [{

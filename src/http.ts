@@ -4,6 +4,7 @@ import http from 'http';
 import { Config } from './config';
 import { MQ } from './mq';
 
+// eslint-disable-next-line import/prefer-default-export
 export class HTTPServer {
   config: Config;
   mq: MQ;

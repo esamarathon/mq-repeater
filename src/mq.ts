@@ -28,6 +28,7 @@ function messageLog(exchange: string, key: string, data: string): void {
   console.log('Sending to exchange %s, key %s: %s', exchange, key, data);
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export class MQ {
   mqConn: AmqpConnectionManager;
   mqChan: ChannelWrapper;
