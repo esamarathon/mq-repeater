@@ -114,6 +114,9 @@ export class HTTPServer {
       this.mq.send(this.config.rabbitmq.exchanges.moderation, 'screened.tweet', {
         message: {
           full_text: req.body.message.full_text,
+          entities: {
+            urls: req.body.message.entities.urls,
+          },
         },
         user: {
           name: req.body.user.name,
